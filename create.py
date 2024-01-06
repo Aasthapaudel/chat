@@ -1,16 +1,25 @@
 from flask import Flask
-from models import *
+from flask_sqlalchemy import SQLAlchemy
+from models import db, User  # Make sure to import your models from the models module
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/rchat'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI']=os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+db = SQLAlchemy(app)
 
-db.init_app(app)
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/rchat'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    db.init_app(app)
+    db.create_all()
+    return app
 
 def main():
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
 if __name__ == "__main__":
-    with app.app_context():
-        main()
+    main()
